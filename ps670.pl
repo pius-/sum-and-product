@@ -25,25 +25,25 @@ s4(Q,500) uses <number> inferences. */
 /* <BODY OF THE PROGRAM> */
 
 s0(Q, N) :-
-        genList(N, Q1),
+        gen_list(N, Q1),
         bs(Q1, Q2),
         rup(Q2, Q).
 
 % generate list of all possible quadruples
-genList(N, L) :-
+gen_list(N, L) :-
         N >= 5,
         X is 2,
         Y is 3,
         S is X + Y,
         P is X * Y,
-        makelist(N, [X,Y,S,P], L).
+        add_to_list(N, [X,Y,S,P], L).
 
-makelist(_, [0,0,0,0], []) :- !.
-makelist(N, [X, Y, S, P], [[X, Y, S, P]|M]):-
+add_to_list(_, [0,0,0,0], []) :- !.
+add_to_list(N, [X, Y, S, P], [[X, Y, S, P]|M]):-
         next(X, Y, N, NewX, NewY),
         NewS is NewX + NewY,
         NewP is NewX * NewY,
-        makelist(N, [NewX, NewY, NewS, NewP], M).
+        add_to_list(N, [NewX, NewY, NewS, NewP], M).
 
 % add 1 to y, if sum goes over fail, if under cut
 next(X, Y, N, NewX, NewY) :-
