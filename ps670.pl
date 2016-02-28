@@ -64,14 +64,14 @@ next(_, _, _, NewX, NewY) :-
         NewY = 0.
 
 % bubble sort products
-bs_pass([[X1,X2,X3,X4],[Y1,Y2,Y3,Y4]|Z],[[X1,X2,X3,X4]|W], N) :- 
-        X4 =< Y4,
+bs_pass([[X1,Y1,S1,P1],[X2,Y2,S2,P2]|Z],[[X1,Y1,S1,P1]|W], N) :- 
+        P1 =< P2,
         !,
-        bs_pass([[Y1,Y2,Y3,Y4]|Z],W,N).
-bs_pass([X,Y|Z],[Y|W],s(N)) :- 
-        bs_pass([X|Z],W,N),
+        bs_pass([[X2,Y2,S2,P2]|Z],W,N).
+bs_pass([A,B|Z],[B|W],s(N)) :- 
+        bs_pass([A|Z],W,N),
         !.
-bs_pass([X], [X], 0) :- !.
+bs_pass([A], [A], 0) :- !.
 bs_pass([], [], 0).
 
 bs(In, Out) :- 
