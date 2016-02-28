@@ -24,6 +24,10 @@ s4(Q,500) uses <number> inferences. */
 
 /* <BODY OF THE PROGRAM> */
 
+s0(Q, N) :-
+        genList(N, Q1),
+        bs(Q1, Q).
+
 % generate list of all possible quadruples
 genList(N, L) :-
         N >= 5,
@@ -58,6 +62,26 @@ next(X, _, N, NewX, NewY) :-
 next(_, _, _, NewX, NewY) :-
         NewX = 0,
         NewY = 0.
+
+% bubble sort products
+bs_pass([[X1,X2,X3,X4],[Y1,Y2,Y3,Y4]|Z],[[X1,X2,X3,X4]|W], N) :- 
+        X4 =< Y4,
+        !,
+        bs_pass([[Y1,Y2,Y3,Y4]|Z],W,N).
+bs_pass([X,Y|Z],[Y|W],s(N)) :- 
+        bs_pass([X|Z],W,N),
+        !.
+bs_pass([X], [X], 0) :- !.
+bs_pass([], [], 0).
+
+bs(In, Out) :- 
+        bs_pass(In, Part, s(_)),
+        !,
+        bs(Part, Out).
+bs(In, In).
+
+
+
 
 /*
 
