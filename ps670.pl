@@ -26,7 +26,8 @@ s4(Q,500) uses <number> inferences. */
 
 s0(Q, N) :-
         genList(N, Q1),
-        bs(Q1, Q).
+        bs(Q1, Q2),
+        rup(Q2, Q).
 
 % generate list of all possible quadruples
 genList(N, L) :-
@@ -80,7 +81,17 @@ bs(In, Out) :-
         bs(Part, Out).
 bs(In, In).
 
-
+% remove unique products
+rup([[X1,Y1,S1,P],[X2,Y2,S2,P],[X3,Y3,S3,P]|T], [[X1,Y1,S1,P]|L]) :-
+        !,
+        rup([[X2,Y2,S2,P],[X3,Y3,S3,P]|T], L).
+rup([[X1,Y1,S1,P],[X2,Y2,S2,P]|T], [[X1,Y1,S1,P],[X2,Y2,S2,P]|L]) :-
+        !,
+        rup(T, L).
+rup([_|T], L) :-
+        rup(T, L),
+        !.
+rup([],[]).
 
 
 /*
