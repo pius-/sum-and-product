@@ -24,19 +24,19 @@ s4(Q,500) uses <number> inferences. */
 
 /* <BODY OF THE PROGRAM> */
 
-s0(Q, N) :-
-        gen_list(N, Q1),
+s1(Q, N) :-
+        s0(Q1, N),
         bs(Q1, Q2),
         rup(Q2, Q).
 
 % generate list of all possible quadruples
-gen_list(N, L) :-
+s0(Q, N) :-
         N >= 5,
         X is 2,
         Y is 3,
         S is X + Y,
         P is X * Y,
-        add_to_list(N, [X,Y,S,P], L).
+        add_to_list(N, [X,Y,S,P], Q).
 
 add_to_list(_, [0,0,0,0], []) :- !.
 add_to_list(N, [X, Y, S, P], [[X, Y, S, P]|M]):-
