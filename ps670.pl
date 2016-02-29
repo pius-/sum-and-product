@@ -26,7 +26,7 @@ s4(Q,500) uses <number> inferences. */
 
 s1(Q, N) :-
         s0(Q1, N),
-        bs(Q1, Q2),
+        bs_prods(Q1, Q2),
         rup(Q2, Q).
 
 % generate list of all possible quadruples
@@ -65,21 +65,38 @@ next(_, _, _, NewX, NewY) :-
         NewY = 0.
 
 % bubble sort products
-bs_pass([[X1,Y1,S1,P1],[X2,Y2,S2,P2]|Z],[[X1,Y1,S1,P1]|W], N) :- 
+bs_prods_pass([[X1,Y1,S1,P1],[X2,Y2,S2,P2]|Z],[[X1,Y1,S1,P1]|W], N) :- 
         P1 =< P2,
         !,
-        bs_pass([[X2,Y2,S2,P2]|Z],W,N).
-bs_pass([A,B|Z],[B|W],s(N)) :- 
-        bs_pass([A|Z],W,N),
+        bs_prods_pass([[X2,Y2,S2,P2]|Z],W,N).
+bs_prods_pass([A,B|Z],[B|W],s(N)) :- 
+        bs_prods_pass([A|Z],W,N),
         !.
-bs_pass([A], [A], 0) :- !.
-bs_pass([], [], 0).
+bs_prods_pass([A], [A], 0) :- !.
+bs_prods_pass([], [], 0).
 
-bs(In, Out) :- 
-        bs_pass(In, Part, s(_)),
+bs_prods(In, Out) :- 
+        bs_prods_pass(In, Part, s(_)),
         !,
-        bs(Part, Out).
-bs(In, In).
+        bs_prods(Part, Out).
+bs_prods(In, In).
+
+% bubble sort sums 
+bs_sums_pass([[X1,Y1,S1,P1],[X2,Y2,S2,P2]|Z],[[X1,Y1,S1,P1]|W], N) :- 
+        S1 =< S2,
+        !,
+        bs_sums_pass([[X2,Y2,S2,P2]|Z],W,N).
+bs_sums_pass([A,B|Z],[B|W],s(N)) :- 
+        bs_sums_pass([A|Z],W,N),
+        !.
+bs_sums_pass([A], [A], 0) :- !.
+bs_sums_pass([], [], 0).
+
+bs_sums(In, Out) :- 
+        bs_sums_pass(In, Part, s(_)),
+        !,
+        bs_sums(Part, Out).
+bs_sums(In, In).
 
 % remove unique products
 rup([[X1,Y1,S1,P],[X2,Y2,S2,P],[X3,Y3,S3,P]|T], [[X1,Y1,S1,P]|L]) :-
@@ -94,7 +111,7 @@ rup([_|T], L) :-
 rup([],[]).
 
 % remove duplicate products
-rdp([[_,_,_,P],[_,_,_,P],[X3,Y2,S3,P]|T], L) :-
+rdp([[_,_,_,P],[_,_,_,P],[X3,Y3,S3,P]|T], L) :-
         !,
         rdp([[X3, Y3, S3, P]|T], L).
 rdp([[_,_,_,P],[_,_,_,P]|T], L) :-
