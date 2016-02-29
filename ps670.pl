@@ -93,6 +93,17 @@ rup([_|T], L) :-
         !.
 rup([],[]).
 
+% remove duplicate products
+rdp([[_,_,_,P],[_,_,_,P],[X3,Y2,S3,P]|T], L) :-
+        !,
+        rdp([[X3, Y3, S3, P]|T], L).
+rdp([[_,_,_,P],[_,_,_,P]|T], L) :-
+        !,
+        rdp(T, L).
+rdp([E|T], [E|L]) :-
+        rdp(T, L),
+        !.
+rdp([],[]).
 
 /*
 
