@@ -24,12 +24,24 @@ s4(Q,500) uses <number> inferences. */
 
 /* <BODY OF THE PROGRAM> */
 
+s2(Q, N) :-
+        s0(ALL, N),
+        bs_prods(ALL, ALL_SORTED_P),
+
+        gup(ALL_SORTED_P, UNIQUE_P),
+        bs_sums(UNIQUE_P, UNIQUE_P_SORTED_S),
+
+        gdp(ALL_SORTED_P, DUPLICATE_P),
+        bs_sums(DUPLICATE_P, DUPLICATE_P_SORTED_S),
+
+        rms(UNIQUE_P_SORTED_S, DUPLICATE_P_SORTED_S, Q).
+
 s1(Q, N) :-
         s0(Q1, N),
         bs_prods(Q1, Q2),
-        rup(Q2, Q).
+        gdp(Q2, Q).
 
-% generate list of all possible quadruples
+% generate list of all possible quadgdples
 s0(Q, N) :-
         N >= 5,
         X is 2,
@@ -99,28 +111,43 @@ bs_sums(In, Out) :-
 bs_sums(In, In).
 
 % remove unique products
-rup([[X1,Y1,S1,P],[X2,Y2,S2,P],[X3,Y3,S3,P]|T], [[X1,Y1,S1,P]|L]) :-
+% get duplicate products
+gdp([[X1,Y1,S1,P],[X2,Y2,S2,P],[X3,Y3,S3,P]|T], [[X1,Y1,S1,P]|L]) :-
         !,
-        rup([[X2,Y2,S2,P],[X3,Y3,S3,P]|T], L).
-rup([[X1,Y1,S1,P],[X2,Y2,S2,P]|T], [[X1,Y1,S1,P],[X2,Y2,S2,P]|L]) :-
+        gdp([[X2,Y2,S2,P],[X3,Y3,S3,P]|T], L).
+gdp([[X1,Y1,S1,P],[X2,Y2,S2,P]|T], [[X1,Y1,S1,P],[X2,Y2,S2,P]|L]) :-
         !,
-        rup(T, L).
-rup([_|T], L) :-
-        rup(T, L),
-        !.
-rup([],[]).
+        gdp(T, L).
+gdp([_|T], L) :-
+        !,
+        gdp(T, L).
+gdp([],[]).
 
 % remove duplicate products
-rdp([[_,_,_,P],[_,_,_,P],[X3,Y3,S3,P]|T], L) :-
+% returns unique products
+gup([[_,_,_,P],[X2,Y2,S2,P],[X3,Y3,S3,P]|T], L) :-
         !,
-        rdp([[X3, Y3, S3, P]|T], L).
-rdp([[_,_,_,P],[_,_,_,P]|T], L) :-
+        gup([[X2,Y2,S2,P],[X3,Y3,S3,P]|T], L).
+gup([[_,_,_,P],[_,_,_,P]|T], L) :-
         !,
-        rdp(T, L).
-rdp([E|T], [E|L]) :-
-        rdp(T, L),
-        !.
-rdp([],[]).
+        gup(T, L).
+gup([E|T], [E|L]) :-
+        !,
+        gup(T, L).
+gup([],[]).
+
+% remove first list from second and return remainder
+rms([], M, M) :- !.
+rms(_, [], []) :- !.
+rms([[X,Y,S,P]|N], [[_,_,S,_]|M], L) :-
+        !,
+        rms([[X,Y,S,P]|N], M, L).
+rms([[_,_,S1,_]|N], [[X2,Y2,S2,P2]|M], L) :-
+        S1<S2,
+        !,
+        rms(N, [[X2,Y2,S2,P2]|M], L).
+rms(N, [E|M], [E|L]):-
+        rms( N, M, L).
 
 /*
 
