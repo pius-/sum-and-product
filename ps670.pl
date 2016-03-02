@@ -24,6 +24,11 @@ s4(Q,500) uses <number> inferences. */
 
 /* <BODY OF THE PROGRAM> */
 
+s3(Q, N) :-
+        s2(Q1, N),
+        bs_prods(Q1, Q2),
+        gup(Q2, Q).
+
 s2(Q, N) :-
         s0(ALL, N),
         bs_prods(ALL, ALL_SORTED_P),
