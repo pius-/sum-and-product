@@ -24,6 +24,11 @@ s4(Q,500) uses <number> inferences. */
 
 /* <BODY OF THE PROGRAM> */
 
+s4(Q, N) :-
+        s3(Q1, N),
+        bs_sums(Q1, Q2),
+        gus(Q2, Q).
+
 s3(Q, N) :-
         s2(Q1, N),
         bs_prods(Q1, Q2),
@@ -140,6 +145,19 @@ gup([E|T], [E|L]) :-
         !,
         gup(T, L).
 gup([],[]).
+
+% remove duplicate sums 
+% returns unique sums 
+gus([[_,_,S,_],[X2,Y2,S,P2],[X3,Y3,S,P3]|T], L) :-
+        !,
+        gus([[X2,Y2,S,P2],[X3,Y3,S,P3]|T], L).
+gus([[_,_,S,_],[_,_,S,_]|T], L) :-
+        !,
+        gus(T, L).
+gus([E|T], [E|L]) :-
+        !,
+        gus(T, L).
+gus([],[]).
 
 % remove first list from second and return remainder
 rms([], M, M) :- !.
