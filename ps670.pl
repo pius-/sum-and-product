@@ -26,29 +26,29 @@ s4(Q,500) uses <number> inferences. */
 
 s4(Q, N) :-
         s3(Q1, N),
-        bs_sums(Q1, Q2),
+        merge_sort_s(Q1, Q2),
         gus(Q2, Q).
 
 s3(Q, N) :-
         s2(Q1, N),
-        bs_prods(Q1, Q2),
+        merge_sort_p(Q1, Q2),
         gup(Q2, Q).
 
 s2(Q, N) :-
         s0(ALL, N),
-        bs_prods(ALL, ALL_SORTED_P),
+        merge_sort_p(ALL, ALL_SORTED_P),
 
         gup(ALL_SORTED_P, UNIQUE_P),
-        bs_sums(UNIQUE_P, UNIQUE_P_SORTED_S),
+        merge_sort_s(UNIQUE_P, UNIQUE_P_SORTED_S),
 
         gdp(ALL_SORTED_P, DUPLICATE_P),
-        bs_sums(DUPLICATE_P, DUPLICATE_P_SORTED_S),
+        merge_sort_s(DUPLICATE_P, DUPLICATE_P_SORTED_S),
 
         rms(UNIQUE_P_SORTED_S, DUPLICATE_P_SORTED_S, Q).
 
 s1(Q, N) :-
         s0(Q1, N),
-        bs_prods(Q1, Q2),
+        merge_sort_p(Q1, Q2),
         gdp(Q2, Q).
 
 % generate list of all possible quadgdples
@@ -86,39 +86,66 @@ next(_, _, _, NewX, NewY) :-
         NewX = 0,
         NewY = 0.
 
-% bubble sort products
-bs_prods_pass([[X1,Y1,S1,P1],[X2,Y2,S2,P2]|Z],[[X1,Y1,S1,P1]|W], N) :- 
+% merge sort products
+merge_sort_p([],[]) :- !.
+merge_sort_p([X],[X]) :- !.
+merge_sort_p(List,Sorted):-
+        !,
+        % list must have atlest two elements
+        List = [_,_|_],
+        % divide list into two parts
+        divide(List,List1,List2),
+
+        % merge sort both parts
+        merge_sort_p(List1,Sorted1),
+        merge_sort_p(List2,Sorted2),
+
+        % merge both
+        merge_p(Sorted1,Sorted2,Sorted).
+
+merge_p([],L,L) :- !.
+merge_p(L,[],L) :- !.
+merge_p([[X1,Y1,S1,P1]|T1],[[X2,Y2,S2,P2]|T2],[[X1,Y1,S1,P1]|T]):- 
         P1 =< P2,
         !,
-        bs_prods_pass([[X2,Y2,S2,P2]|Z],W,N).
-bs_prods_pass([A,B|Z],[B|W],s(N)) :- 
-        bs_prods_pass([A|Z],W,N),
-        !.
-bs_prods_pass([A], [A], 0) :- !.
-bs_prods_pass([], [], 0).
-
-bs_prods(In, Out) :- 
-        bs_prods_pass(In, Part, s(_)),
+        merge_p(T1,[[X2,Y2,S2,P2]|T2],T).
+merge_p([[X1,Y1,S1,P1]|T1],[[X2,Y2,S2,P2]|T2],[[X2,Y2,S2,P2]|T]):- 
+        P1 > P2,
         !,
-        bs_prods(Part, Out).
-bs_prods(In, In).
+        merge_p([[X1,Y1,S1,P1]|T1],T2,T).
 
-% bubble sort sums 
-bs_sums_pass([[X1,Y1,S1,P1],[X2,Y2,S2,P2]|Z],[[X1,Y1,S1,P1]|W], N) :- 
+% merge sort sums
+merge_sort_s([],[]) :- !.
+merge_sort_s([X],[X]) :- !.
+merge_sort_s(List,Sorted):-
+        !,
+        List = [_,_|_],
+        divide(List,List1,List2),
+        merge_sort_s(List1,Sorted1),
+        merge_sort_s(List2,Sorted2),
+        merge_s(Sorted1,Sorted2,Sorted).
+
+merge_s([],L,L) :- !.
+merge_s(L,[],L) :- !.
+merge_s([[X1,Y1,S1,P1]|T1],[[X2,Y2,S2,P2]|T2],[[X1,Y1,S1,P1]|T]):- 
         S1 =< S2,
         !,
-        bs_sums_pass([[X2,Y2,S2,P2]|Z],W,N).
-bs_sums_pass([A,B|Z],[B|W],s(N)) :- 
-        bs_sums_pass([A|Z],W,N),
-        !.
-bs_sums_pass([A], [A], 0) :- !.
-bs_sums_pass([], [], 0).
-
-bs_sums(In, Out) :- 
-        bs_sums_pass(In, Part, s(_)),
+        merge_s(T1,[[X2,Y2,S2,P2]|T2],T).
+merge_s([[X1,Y1,S1,P1]|T1],[[X2,Y2,S2,P2]|T2],[[X2,Y2,S2,P2]|T]):- 
+        S1 > S2,
         !,
-        bs_sums(Part, Out).
-bs_sums(In, In).
+        merge_s([[X1,Y1,S1,P1]|T1],T2,T).
+
+divide(L,List1,List2):-
+        split(L,List1,List2).
+   
+split([X,Y|T], [X|List1], [Y|List2]) :- 
+        !,
+        split(T, List1, List2).
+split([X], [X|List1], List2) :-
+        !,
+        split([], List1, List2).
+split([], [], []).
 
 % remove unique products
 % get duplicate products
