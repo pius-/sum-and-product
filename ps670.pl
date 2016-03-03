@@ -27,21 +27,19 @@ s4(Q,500) uses <number> inferences. */
 s4(Q, N) :-
         s3(Q1, N),
         merge_sort_s(Q1, Q2),
-        gus(Q2, Q).
+        guds(Q2, Q, _).
 
 s3(Q, N) :-
         s2(Q1, N),
         merge_sort_p(Q1, Q2),
-        gup(Q2, Q).
+        gudp(Q2, Q, _).
 
 s2(Q, N) :-
         s0(ALL, N),
         merge_sort_p(ALL, ALL_SORTED_P),
 
-        gup(ALL_SORTED_P, UNIQUE_P),
+        gudp(ALL_SORTED_P, UNIQUE_P, DUPLICATE_P),
         merge_sort_s(UNIQUE_P, UNIQUE_P_SORTED_S),
-
-        gdp(ALL_SORTED_P, DUPLICATE_P),
         merge_sort_s(DUPLICATE_P, DUPLICATE_P_SORTED_S),
 
         rms(UNIQUE_P_SORTED_S, DUPLICATE_P_SORTED_S, Q).
@@ -49,7 +47,7 @@ s2(Q, N) :-
 s1(Q, N) :-
         s0(Q1, N),
         merge_sort_p(Q1, Q2),
-        gdp(Q2, Q).
+        gudp(Q2, _, Q).
 
 % generate list of all possible quadgdples
 s0(Q, N) :-
@@ -147,44 +145,29 @@ split([X], [X|List1], List2) :-
         split([], List1, List2).
 split([], [], []).
 
-% remove unique products
-% get duplicate products
-gdp([[X1,Y1,S1,P],[X2,Y2,S2,P],[X3,Y3,S3,P]|T], [[X1,Y1,S1,P]|L]) :-
+% get unique and dup products
+gudp([[X1,Y1,S1,P],[X2,Y2,S2,P],[X3,Y3,S3,P]|T], U, [[X1,Y1,S1,P]|D]) :-
         !,
-        gdp([[X2,Y2,S2,P],[X3,Y3,S3,P]|T], L).
-gdp([[X1,Y1,S1,P],[X2,Y2,S2,P]|T], [[X1,Y1,S1,P],[X2,Y2,S2,P]|L]) :-
+        gudp([[X2,Y2,S2,P],[X3,Y3,S3,P]|T], U, D).
+gudp([[X1,Y1,S1,P],[X2,Y2,S2,P]|T], U, [[X1,Y1,S1,P],[X2,Y2,S2,P]|D]) :-
         !,
-        gdp(T, L).
-gdp([_|T], L) :-
+        gudp(T, U, D).
+gudp([E|T], [E|U], D) :-
         !,
-        gdp(T, L).
-gdp([],[]).
+        gudp(T, U, D).
+gudp([],[],[]).
 
-% remove duplicate products
-% returns unique products
-gup([[_,_,_,P],[X2,Y2,S2,P],[X3,Y3,S3,P]|T], L) :-
+% get unique and dup sums 
+guds([[X1,Y1,S,P1],[X2,Y2,S,P2],[X3,Y3,S,P3]|T], U, [[X1,Y1,S,P1]|D]) :-
         !,
-        gup([[X2,Y2,S2,P],[X3,Y3,S3,P]|T], L).
-gup([[_,_,_,P],[_,_,_,P]|T], L) :-
+        guds([[X2,Y2,S,P2],[X3,Y3,S,P3]|T], U, D).
+guds([[X1,Y1,S,P1],[X2,Y2,S,P2]|T], U, [[X1,Y1,S,P1],[X2,Y2,S,P2]|D]) :-
         !,
-        gup(T, L).
-gup([E|T], [E|L]) :-
+        guds(T, U, D).
+guds([E|T], [E|U], D) :-
         !,
-        gup(T, L).
-gup([],[]).
-
-% remove duplicate sums 
-% returns unique sums 
-gus([[_,_,S,_],[X2,Y2,S,P2],[X3,Y3,S,P3]|T], L) :-
-        !,
-        gus([[X2,Y2,S,P2],[X3,Y3,S,P3]|T], L).
-gus([[_,_,S,_],[_,_,S,_]|T], L) :-
-        !,
-        gus(T, L).
-gus([E|T], [E|L]) :-
-        !,
-        gus(T, L).
-gus([],[]).
+        guds(T, U, D).
+guds([],[],[]).
 
 % remove first list from second and return remainder
 rms([], M, M) :- !.
