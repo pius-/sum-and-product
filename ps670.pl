@@ -135,15 +135,13 @@ merge_s([[X1,Y1,S1,P1]|T1],[[X2,Y2,S2,P2]|T2],[[X2,Y2,S2,P2]|T]):-
         merge_s([[X1,Y1,S1,P1]|T1],T2,T).
 
 divide(L,List1,List2):-
-        split(L,List1,List2).
+        split(L,L,List1,List2).
    
-split([X,Y|T], [X|List1], [Y|List2]) :- 
-        !,
-        split(T, List1, List2).
-split([X], [X|List1], List2) :-
-        !,
-        split([], List1, List2).
-split([], [], []).
+split([],R,[],R).
+split([_],R,[],R).
+split([_,_|T],[X|L],[X|L1],R):-
+        split(T,L,L1,R),
+        !.
 
 % get unique and dup products
 gudp([[X1,Y1,S1,P],[X2,Y2,S2,P],[X3,Y3,S3,P]|T], U, [[X1,Y1,S1,P]|D]) :-
