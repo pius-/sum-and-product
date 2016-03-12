@@ -37,11 +37,9 @@ s3(Q, N) :-
 s2(Q, N) :-
         s0(ALL, N),
         merge_sort_p(ALL, ALL_SORTED_P),
-
         gudp(ALL_SORTED_P, UNIQUE_P, DUPLICATE_P),
         merge_sort_s(UNIQUE_P, UNIQUE_P_SORTED_S),
         merge_sort_s(DUPLICATE_P, DUPLICATE_P_SORTED_S),
-
         rms(UNIQUE_P_SORTED_S, DUPLICATE_P_SORTED_S, Q).
 
 s1(Q, N) :-
@@ -51,96 +49,91 @@ s1(Q, N) :-
 
 % generate list of all possible quadgdples
 s0(Q, N) :-
-        N >= 5,
         X is 2,
         Y is 3,
         S is X + Y,
         P is X * Y,
         add_to_list(N, [X,Y,S,P], Q).
 
-add_to_list(_, [0,0,0,0], []) :- !.
 add_to_list(N, [X, Y, S, P], [[X, Y, S, P]|M]):-
-        next(X, Y, N, NewX, NewY),
-        NewS is NewX + NewY,
-        NewP is NewX * NewY,
-        add_to_list(N, [NewX, NewY, NewS, NewP], M).
+        next(X, Y, N, NEW_X, NEW_Y),
+        NEW_S is NEW_X + NEW_Y,
+        NEW_P is NEW_X * NEW_Y,
+        add_to_list(N, [NEW_X, NEW_Y, NEW_S, NEW_P], M),
+        !.
+add_to_list(_, _, []).
 
 % add 1 to y, if sum goes over fail, if under cut
-next(X, Y, N, NewX, NewY) :-
-        NewY is Y + 1,
-        X + NewY =< N,
+next(X, Y, N, NEW_X, NEW_Y) :-
+        NEW_Y is Y + 1,
+        X + NEW_Y =< N,
         !,
-        NewX is X.
+        NEW_X is X.
 
 % add 1 to x, y is x + 1, if sum goes overn fail
-next(X, _, N, NewX, NewY) :-
-        NewX is X + 1,
-        NewY is NewX + 1,
-        NewX + NewY =< N,
+next(X, _, N, NEW_X, NEW_Y) :-
+        NEW_X is X + 1,
+        NEW_Y is NEW_X + 1,
+        NEW_X + NEW_Y =< N,
         !.
-        
-% if no more options set to zero
-next(_, _, _, NewX, NewY) :-
-        NewX = 0,
-        NewY = 0.
 
 % merge sort products
-merge_sort_p([],[]) :- !.
-merge_sort_p([X],[X]) :- !.
-merge_sort_p(List,Sorted):-
+merge_sort_p([], []) :- !.
+merge_sort_p([X], [X]) :- !.
+merge_sort_p(L, S):-
         !,
         % list must have atlest two elements
-        List = [_,_|_],
+        L = [_, _|_],
         % divide list into two parts
-        divide(List,List1,List2),
+        divide(L, L1, L2),
 
         % merge sort both parts
-        merge_sort_p(List1,Sorted1),
-        merge_sort_p(List2,Sorted2),
+        merge_sort_p(L1, S1),
+        merge_sort_p(L2, S2),
 
         % merge both
-        merge_p(Sorted1,Sorted2,Sorted).
+        merge_p(S1, S2, S).
 
 merge_p([],L,L) :- !.
 merge_p(L,[],L) :- !.
-merge_p([[X1,Y1,S1,P1]|T1],[[X2,Y2,S2,P2]|T2],[[X1,Y1,S1,P1]|T]):- 
+merge_p([[X1,Y1,S1,P1]|T1], [[X2,Y2,S2,P2]|T2], [[X1,Y1,S1,P1]|T]):- 
         P1 =< P2,
         !,
-        merge_p(T1,[[X2,Y2,S2,P2]|T2],T).
-merge_p([[X1,Y1,S1,P1]|T1],[[X2,Y2,S2,P2]|T2],[[X2,Y2,S2,P2]|T]):- 
+        merge_p(T1, [[X2,Y2,S2,P2]|T2], T).
+merge_p([[X1,Y1,S1,P1]|T1], [[X2,Y2,S2,P2]|T2], [[X2,Y2,S2,P2]|T]):- 
         P1 > P2,
         !,
-        merge_p([[X1,Y1,S1,P1]|T1],T2,T).
+        merge_p([[X1,Y1,S1,P1]|T1], T2, T).
 
 % merge sort sums
 merge_sort_s([],[]) :- !.
 merge_sort_s([X],[X]) :- !.
-merge_sort_s(List,Sorted):-
+merge_sort_s(L,S):-
         !,
-        List = [_,_|_],
-        divide(List,List1,List2),
-        merge_sort_s(List1,Sorted1),
-        merge_sort_s(List2,Sorted2),
-        merge_s(Sorted1,Sorted2,Sorted).
+        L = [_, _|_],
+        divide(L, L1, L2),
+        merge_sort_s(L1, S1),
+        merge_sort_s(L2, S2),
+        merge_s(S1, S2, S).
 
-merge_s([],L,L) :- !.
-merge_s(L,[],L) :- !.
-merge_s([[X1,Y1,S1,P1]|T1],[[X2,Y2,S2,P2]|T2],[[X1,Y1,S1,P1]|T]):- 
+merge_s([], L, L) :- !.
+merge_s(L, [], L) :- !.
+merge_s([[X1,Y1,S1,P1]|T1], [[X2,Y2,S2,P2]|T2], [[X1,Y1,S1,P1]|T]):- 
         S1 =< S2,
         !,
-        merge_s(T1,[[X2,Y2,S2,P2]|T2],T).
-merge_s([[X1,Y1,S1,P1]|T1],[[X2,Y2,S2,P2]|T2],[[X2,Y2,S2,P2]|T]):- 
+        merge_s(T1, [[X2,Y2,S2,P2]|T2], T).
+merge_s([[X1,Y1,S1,P1]|T1], [[X2,Y2,S2,P2]|T2], [[X2,Y2,S2,P2]|T]):- 
         S1 > S2,
         !,
-        merge_s([[X1,Y1,S1,P1]|T1],T2,T).
+        merge_s([[X1,Y1,S1,P1]|T1], T2, T).
 
-divide(L,List1,List2):-
-        split(L,L,List1,List2).
+divide(L, L1, L2):-
+        split(L, L, L1, L2).
    
-split([],R,[],R).
-split([_],R,[],R).
-split([_,_|T],[X|L],[X|L1],R):-
-        split(T,L,L1,R),
+split([], R, [], R).
+split([_], R, [], R).
+split([_,_|T], [X|L], [X|L1], R):-
+        split(T, L, L1, R),
         !.
 
 % get unique and dup products
@@ -174,11 +167,11 @@ rms([[X,Y,S,P]|N], [[_,_,S,_]|M], L) :-
         !,
         rms([[X,Y,S,P]|N], M, L).
 rms([[_,_,S1,_]|N], [[X2,Y2,S2,P2]|M], L) :-
-        S1<S2,
+        S1 < S2,
         !,
         rms(N, [[X2,Y2,S2,P2]|M], L).
 rms(N, [E|M], [E|L]):-
-        rms( N, M, L).
+        rms(N, M, L).
 
 /*
 
